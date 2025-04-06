@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Virtualenv
+venv/
+env/
+myenv/
+ENV/
+*.env
+
+# Environment variable file
+.env
+.env.*
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# VS Code & IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.so
+*.egg-info/
+
+# Tests
+htmlcov/
+coverage.xml
+.tox/
+.pytest_cache/
+.cache/
+
+# Deployment
+local_settings.py
+secrets.json
+
+# Render specific (if needed)
+build/

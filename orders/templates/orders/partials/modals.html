@@ -1,0 +1,113 @@
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal{{ order.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ order.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <form method="post" action="{% url 'orders:update_order' order.id %}">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">✏️ Edit Order #{{ order.order_number }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <label>Customer Name</label>
+                <input type="text" class="form-control" name="customer_name" value="{{ order.customer_name }}">
+              </div>
+              <div class="col-md-6">
+                <label>Customer Phone</label>
+                <input type="text" class="form-control" name="customer_phone" value="{{ order.customer_phone }}">
+              </div>
+            </div>
+  
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <label>Order Number</label>
+                <input type="text" class="form-control" name="order_number" value="{{ order.order_number }}">
+              </div>
+              <div class="col-md-6">
+                <label>Order Date</label>
+                <input type="date" class="form-control" name="order_date" value="{{ order.order_date|date:'Y-m-d' }}">
+              </div>
+            </div>
+  
+            <div class="mb-2">
+              <label>Customer Address</label>
+              <input type="text" class="form-control" name="customer_address" value="{{ order.customer_address }}">
+            </div>
+  
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="is_delivered" {% if order.is_delivered %}checked{% endif %}>
+              <label class="form-check-label">Delivered</label>
+            </div>
+  
+            <h6 class="text-secondary">📦 Order Items</h6>
+            <input type="hidden" name="items_count" value="{{ order.items.count }}">
+            {% for item in order.items.all %}
+              <input type="hidden" name="item_{{ forloop.counter0 }}_id" value="{{ item.id }}">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <input type="text" name="item_{{ forloop.counter0 }}_name" class="form-control" value="{{ item.product_name }}">
+                </div>
+                <div class="col-md-3">
+                  <input type="number" name="item_{{ forloop.counter0 }}_qty" class="form-control" value="{{ item.quantity }}">
+                </div>
+                <div class="col-md-3">
+                  <input type="number" step="0.01" name="item_{{ forloop.counter0 }}_price" class="form-control" value="{{ item.selling_price }}">
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">💾 Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal{{ order.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ order.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="post" action="{% url 'orders:delete_order' order.id %}">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteModalLabel{{ order.id }}">Confirm Delete</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete order #{{ order.order_number }} for {{ order.customer_name }}?
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Status Update Modal -->
+  <div class="modal fade" id="statusModal{{ order.id }}" tabindex="-1" aria-labelledby="statusModalLabel{{ order.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="post" action="{% url 'orders:mark_delivered' order.id %}">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="statusModalLabel{{ order.id }}">Mark as Delivered</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            Mark order <strong>#{{ order.order_number }}</strong> as delivered for <strong>{{ order.customer_name }}</strong>?
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">✔️ Confirm</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  

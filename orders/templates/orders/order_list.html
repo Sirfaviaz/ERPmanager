@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body { padding: 2rem; background: #f8f9fa; }
+    .pointer-row { cursor: pointer; }
+    .accordion-button:not(.collapsed) { background-color: #e2e6ea; }
+    .table td, .table th { vertical-align: middle; }
+    .edit-delete-btns { white-space: nowrap; }
+    .text-muted-small { font-size: 0.875rem; color: #6c757d; }
+  </style>
+</head>
+<body>
+
+<div class="container mb-4">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">🔍 Search</label>
+      <input type="text" name="q" class="form-control" placeholder="Name, Phone or Order #" value="{{ query }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">📅 From</label>
+      <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">📅 To</label>
+      <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+    </div>
+    <div class="col-md-3 d-grid">
+      <button type="submit" class="btn btn-primary">🔎 Filter</button>
+    </div>
+  </form>
+</div>
+
+<div class="container">
+  <h2 class="mb-4 text-primary">📋 Orders</h2>
+
+  <table class="table table-bordered align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Phone</th>
+        <th>Items</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+      <tr class="pointer-row" data-bs-toggle="collapse" data-bs-target="#orderDetails{{ order.id }}">
+        <td>{{ order.order_number }}</td>
+        <td>
+          {{ order.customer_name }}<br>
+          <small class="text-muted-small">{{ order.source }}</small>
+        </td>
+        <td>{{ order.customer_phone }}</td>
+        <td>{{ order.items.count }}</td>
+        <td>
+          QR 
+          {% with 0 as total %}
+            {% for item in order.items.all %}
+              {% if item.selling_price %}
+                {% widthratio item.selling_price 1 1 as price %}
+                {% widthratio price item.quantity 1 as item_total %}
+                {% with total|add:item_total as total %}
+                {% endwith %}
+              {% endif %}
+            {% endfor %}
+            {{ total }}
+          {% endwith %}
+        </td>
+        <td>{{ order.is_delivered|yesno:"✅ Done,❌ Pending" }}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#statusModal{{ order.id }}">✔️ Done</button>
+        </td>
+      </tr>
+
+      <tr class="collapse bg-light" id="orderDetails{{ order.id }}">
+        <td colspan="7">
+          <div class="p-3">
+            <strong>📍 Address:</strong> {{ order.customer_address }}<br>
+            <strong>📅 Date:</strong> {{ order.order_date }}<br>
+            <strong>🧾 Items:</strong>
+            <ul class="mt-2">
+              {% for item in order.items.all %}
+                <li>{{ item.quantity }} × {{ item.product_name }} — QR {{ item.selling_price|default:"-" }}</li>
+              {% endfor %}
+            </ul>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ order.id }}">✏️ Edit</button>
+            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ order.id }}">🗑️ Delete</button>
+          </div>
+        </td>
+      </tr>
+
+      {% include "orders/partials/modals.html" with order=order %}
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if not orders %}
+    <div class="alert alert-info">No orders available.</div>
+  {% endif %}
+
+  <a href="{% url 'orders:extract_order' %}" class="btn btn-secondary mt-3">⬅ Back to Upload</a>
+</div>
+
+</body>
+</html>
