@@ -28,7 +28,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-default-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    os.getenv('RENDER_EXTERNAL_HOSTNAME', 'erpmanager.onrender.com')
+]
+
 
 
 # Application definition
